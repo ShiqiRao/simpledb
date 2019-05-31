@@ -4,10 +4,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * The Catalog keeps track of all available tables in the database and their
@@ -22,6 +19,8 @@ import java.util.UUID;
  */
 
 public class Catalog {
+
+    private Map<Integer, Table> tables = new HashMap<>();
 
     /**
      * Constructor.
@@ -43,6 +42,7 @@ public class Catalog {
      */
     public void addTable(DbFile file, String name, String pkeyField) {
         // some code goes here
+        this.tables.put(file.getId(), new Table(file, name, pkeyField));
     }
 
     public void addTable(DbFile file, String name) {
@@ -68,46 +68,59 @@ public class Catalog {
      */
     public int getTableId(String name) throws NoSuchElementException {
         // some code goes here
-        return 0;
+        for (Map.Entry<Integer, Table> tableEntry : tables.entrySet()) {
+            if (tableEntry.getValue().getName().equals(name)) {
+                return tableEntry.getKey();
+            }
+        }
+        throw new NoSuchElementException();
     }
 
     /**
      * Returns the tuple descriptor (schema) of the specified table
      *
-     * @param tableid The id of the table, as specified by the DbFile.getId()
+     * @param tableId The id of the table, as specified by the DbFile.getId()
      *                function passed to addTable
      * @throws NoSuchElementException if the table doesn't exist
      */
-    public TupleDesc getTupleDesc(int tableid) throws NoSuchElementException {
+    public TupleDesc getTupleDesc(int tableId) throws NoSuchElementException {
         // some code goes here
-        return null;
+        return getDbFile(tableId).getTupleDesc();
     }
 
     /**
      * Returns the DbFile that can be used to read the contents of the
      * specified table.
      *
-     * @param tableid The id of the table, as specified by the DbFile.getId()
+     * @param tableId The id of the table, as specified by the DbFile.getId()
      *                function passed to addTable
      */
-    public DbFile getDbFile(int tableid) throws NoSuchElementException {
+    public DbFile getDbFile(int tableId) throws NoSuchElementException {
         // some code goes here
-        return null;
+        return getTable(tableId).getFile();
     }
 
-    public String getPrimaryKey(int tableid) {
+    private Table getTable(int tableId) throws NoSuchElementException {
+        Table t = this.tables.get(tableId);
+        if (t == null) {
+            throw new NoSuchElementException();
+        }
+        return t;
+    }
+
+    public String getPrimaryKey(int tableId) {
         // some code goes here
-        return null;
+        return getTable(tableId).getPrimaryKeyName();
     }
 
     public Iterator<Integer> tableIdIterator() {
         // some code goes here
-        return null;
+        return this.tables.keySet().iterator();
     }
 
     public String getTableName(int id) {
         // some code goes here
-        return null;
+        return this.tables.get(id).getName();
     }
 
     /**
@@ -115,6 +128,7 @@ public class Catalog {
      */
     public void clear() {
         // some code goes here
+        this.tables = new HashMap<>(0);
     }
 
     /**
@@ -131,7 +145,7 @@ public class Catalog {
             while ((line = br.readLine()) != null) {
                 //assume line is of the format name (field type, field type, ...)
                 String name = line.substring(0, line.indexOf("(")).trim();
-                //System.out.println("TABLE NAME: " + name);
+                System.out.println("TABLE NAME: " + name);
                 String fields = line.substring(line.indexOf("(") + 1, line.indexOf(")")).trim();
                 String[] els = fields.split(",");
                 ArrayList<String> names = new ArrayList<String>();
@@ -149,8 +163,9 @@ public class Catalog {
                         System.exit(0);
                     }
                     if (els2.length == 3) {
-                        if (els2[2].trim().equals("pk"))
+                        if (els2[2].trim().equals("pk")) {
                             primaryKey = els2[0].trim();
+                        }
                         else {
                             System.out.println("Unknown annotation " + els2[2]);
                             System.exit(0);

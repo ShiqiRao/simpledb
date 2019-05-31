@@ -1,7 +1,9 @@
 package com.dzion.simpledb;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Tuple maintains information about the contents of a tuple. Tuples have a
@@ -10,6 +12,10 @@ import java.util.Iterator;
  * Tuple维护有关元组内容的信息。 元组具有由TupleDesc对象指定的指定模式，并包含具有每个字段的数据的Field对象。
  */
 public class Tuple implements Serializable {
+
+    private TupleDesc td;
+    private RecordId recordId;
+    private List<Field> fields = new ArrayList<>();
 
     private static final long serialVersionUID = 1L;
 
@@ -21,6 +27,7 @@ public class Tuple implements Serializable {
      */
     public Tuple(TupleDesc td) {
         // some code goes here
+        this.td = td;
     }
 
     /**
@@ -28,7 +35,7 @@ public class Tuple implements Serializable {
      */
     public TupleDesc getTupleDesc() {
         // some code goes here
-        return null;
+        return this.td;
     }
 
     /**
@@ -37,7 +44,7 @@ public class Tuple implements Serializable {
      */
     public RecordId getRecordId() {
         // some code goes here
-        return null;
+        return this.recordId;
     }
 
     /**
@@ -47,6 +54,7 @@ public class Tuple implements Serializable {
      */
     public void setRecordId(RecordId rid) {
         // some code goes here
+        this.recordId = rid;
     }
 
     /**
@@ -57,6 +65,7 @@ public class Tuple implements Serializable {
      */
     public void setField(int i, Field f) {
         // some code goes here
+        this.fields.add(i, f);
     }
 
     /**
@@ -65,7 +74,7 @@ public class Tuple implements Serializable {
      */
     public Field getField(int i) {
         // some code goes here
-        return null;
+        return this.fields.get(i);
     }
 
     /**
@@ -76,9 +85,17 @@ public class Tuple implements Serializable {
      * <p>
      * where \t is any whitespace, except newline, and \n is a newline
      */
+    @Override
     public String toString() {
         // some code goes here
-        throw new UnsupportedOperationException("Implement this");
+        StringBuffer ret =new StringBuffer();
+        for(Field f:fields){
+            ret.append(f.toString()).append(" ");
+        }
+        if(fields.size()>0){
+            ret.deleteCharAt(ret.lastIndexOf(" "));
+        }
+        return ret.toString();
     }
 
     /**
@@ -86,6 +103,6 @@ public class Tuple implements Serializable {
      */
     public Iterator<Field> fields() {
         // some code goes here
-        return null;
+        return fields.iterator();
     }
 }

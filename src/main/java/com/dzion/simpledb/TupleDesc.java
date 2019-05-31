@@ -58,13 +58,35 @@ public class TupleDesc implements Serializable {
         }
     }
 
+    private class SimpleArrayIterator implements Iterator<TDItem> {
+        private int nextSlot = 0;
+
+        @Override
+        public boolean hasNext() {
+            return nextSlot < items.length;
+        }
+
+        @Override
+        public TDItem next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            return items[nextSlot++];
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+    }
+
     /**
      * @return An iterator which iterates over all the field TDItems
      * that are included in this TupleDesc
      */
     public Iterator<TDItem> iterator() {
         // some code goes here
-        return null;
+        return new SimpleArrayIterator();
     }
 
     private static final long serialVersionUID = 1L;

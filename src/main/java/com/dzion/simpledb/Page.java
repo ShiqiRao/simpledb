@@ -23,19 +23,19 @@ public interface Page {
      *
      * @return the id of this page
      */
-    public PageId getId();
+    PageId getId();
 
     /**
      * Get the id of the transaction that last dirtied this page, or null if the page is clean..
      *
      * @return The id of the transaction that last dirtied this page, or null
      */
-    public TransactionId isDirty();
+    TransactionId isDirty();
 
     /**
      * Set the dirty state of this page as dirtied by a particular transaction
      */
-    public void markDirty(boolean dirty, TransactionId tid);
+    void markDirty(boolean dirty, TransactionId tid);
 
     /**
      * Generates a byte array representing the contents of this page.
@@ -48,17 +48,17 @@ public interface Page {
      * @return A byte array correspond to the bytes of this page.
      */
 
-    public byte[] getPageData();
+    byte[] getPageData();
 
     /**
      * Provide a representation of this page before any modifications were made
      * to it.  Used by recovery.
      */
-    public Page getBeforeImage();
+    Page getBeforeImage();
 
-    /*
+    /**
      * a transaction that wrote this page just committed it.
      * copy current content to the before image.
      */
-    public void setBeforeImage();
+    void setBeforeImage();
 }

@@ -20,7 +20,7 @@ public interface DbFile extends Serializable {
      *
      * @throws IllegalArgumentException if the page does not exist in this file.
      */
-    public Page readPage(PageId id);
+    Page readPage(PageId id);
 
     /**
      * Push the specified page to disk.
@@ -29,7 +29,7 @@ public interface DbFile extends Serializable {
      *         written.
      * @throws IOException if the write fails
      */
-    public void writePage(Page p) throws IOException;
+    void writePage(Page p) throws IOException;
 
     /**
      * Inserts the specified tuple to the file on behalf of transaction.
@@ -43,7 +43,7 @@ public interface DbFile extends Serializable {
      * @throws DbException if the tuple cannot be added
      * @throws IOException if the needed file can't be read/written
      */
-    public ArrayList<Page> insertTuple(TransactionId tid, Tuple t)
+    ArrayList<Page> insertTuple(TransactionId tid, Tuple t)
             throws DbException, IOException, TransactionAbortedException;
 
     /**
@@ -55,7 +55,7 @@ public interface DbFile extends Serializable {
      * @throws DbException if the tuple cannot be deleted or is not a member
      *                     of the file
      */
-    public Page deleteTuple(TransactionId tid, Tuple t)
+    Page deleteTuple(TransactionId tid, Tuple t)
             throws DbException, TransactionAbortedException;
 
     /**
@@ -65,7 +65,7 @@ public interface DbFile extends Serializable {
      *
      * @return an iterator over all the tuples stored in this DbFile.
      */
-    public DbFileIterator iterator(TransactionId tid);
+    DbFileIterator iterator(TransactionId tid);
 
     /**
      * Returns a unique ID used to identify this DbFile in the Catalog. This id
@@ -80,12 +80,12 @@ public interface DbFile extends Serializable {
      *
      * @return an ID uniquely identifying this HeapFile.
      */
-    public int getId();
+    int getId();
 
     /**
      * Returns the TupleDesc of the table stored in this DbFile.
      *
      * @return TupleDesc of this DbFile.
      */
-    public TupleDesc getTupleDesc();
+    TupleDesc getTupleDesc();
 }

@@ -1,6 +1,7 @@
 package com.dzion.simpledb;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 /**
  * BufferPool manages the reading and writing of pages into memory from
@@ -28,6 +29,8 @@ public class BufferPool {
      */
     public static final int DEFAULT_PAGES = 50;
 
+    private HashMap<PageId, Page> pageMap;
+
     /**
      * Creates a BufferPool that caches up to numPages pages.
      *
@@ -35,6 +38,7 @@ public class BufferPool {
      */
     public BufferPool(int numPages) {
         // some code goes here
+        pageMap = new HashMap<>(numPages);
     }
 
     /**
@@ -55,7 +59,13 @@ public class BufferPool {
     public Page getPage(TransactionId tid, PageId pid, Permissions perm)
             throws TransactionAbortedException, DbException {
         // some code goes here
-        return null;
+        //todo: tid perm
+        Page ret = pageMap.get(pid);
+        if (ret == null) {
+            HeapFile file = (HeapFile) Database.getCatalog().getDbFile(pid.getTableId());
+            ret = file.readPage(pid);
+        }
+        return ret;
     }
 
     /**
