@@ -29,6 +29,8 @@ public class BufferPool {
      */
     public static final int DEFAULT_PAGES = 50;
 
+    public final int PAGES_NUM;
+
     private HashMap<PageId, Page> pageMap;
 
     /**
@@ -39,6 +41,7 @@ public class BufferPool {
     public BufferPool(int numPages) {
         // some code goes here
         pageMap = new HashMap<>(numPages);
+        PAGES_NUM = numPages;
     }
 
     /**
@@ -64,8 +67,17 @@ public class BufferPool {
         if (ret == null) {
             HeapFile file = (HeapFile) Database.getCatalog().getDbFile(pid.getTableId());
             ret = file.readPage(pid);
+            addNewPage(pid, ret);
         }
         return ret;
+    }
+
+    private void addNewPage(PageId pid, Page newPage) {
+        pageMap.put(pid, newPage);
+        //如果超出了最大的缓存页数量
+        if (pageMap.size() > PAGES_NUM) {
+            // TODO: 17-5-26 implement this
+        }
     }
 
     /**
