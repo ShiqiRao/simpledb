@@ -6,6 +6,9 @@ package com.dzion.simpledb;
  */
 public class HeapPageId implements PageId {
 
+    private int tableId;
+    private int pageNumber;
+
     /**
      * Constructor. Create a page id structure for a specific page of a
      * specific table.
@@ -15,23 +18,27 @@ public class HeapPageId implements PageId {
      */
     public HeapPageId(int tableId, int pgNo) {
         // some code goes here
+        this.tableId = tableId;
+        this.pageNumber = pgNo;
     }
 
     /**
      * @return the table associated with this PageId
      */
+    @Override
     public int getTableId() {
         // some code goes here
-        return 0;
+        return this.tableId;
     }
 
     /**
      * @return the page number in the table getTableId() associated with
      * this PageId
      */
+    @Override
     public int pageNumber() {
         // some code goes here
-        return 0;
+        return this.pageNumber;
     }
 
     /**
@@ -40,9 +47,13 @@ public class HeapPageId implements PageId {
      * key in a hash table in the BufferPool, for example.)
      * @see BufferPool
      */
+    @Override
     public int hashCode() {
         // some code goes here
-        throw new UnsupportedOperationException("implement this");
+        int ret = 17;
+        ret = ret * 31 + Integer.hashCode(tableId);
+        ret = ret * 31 + Integer.hashCode(pageNumber);
+        return ret;
     }
 
     /**
@@ -52,9 +63,13 @@ public class HeapPageId implements PageId {
      * @return true if the objects are equal (e.g., page numbers and table
      * ids are the same)
      */
+    @Override
     public boolean equals(Object o) {
         // some code goes here
-        return false;
+        if (!(o instanceof HeapPageId)) {
+            return false;
+        }
+        return ((HeapPageId) o).tableId == this.tableId && ((HeapPageId) o).pageNumber == this.pageNumber;
     }
 
     /**
@@ -63,8 +78,9 @@ public class HeapPageId implements PageId {
      * number of integers that corresponds to number of args to one of the
      * constructors.
      */
+    @Override
     public int[] serialize() {
-        int data[] = new int[2];
+        int[] data = new int[2];
 
         data[0] = getTableId();
         data[1] = pageNumber();

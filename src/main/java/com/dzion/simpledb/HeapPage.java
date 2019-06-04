@@ -15,13 +15,12 @@ import java.util.NoSuchElementException;
  */
 public class HeapPage implements Page {
 
-    HeapPageId pid;
-    TupleDesc td;
-    byte header[];
-    Tuple tuples[];
-    int numSlots;
-
-    byte[] oldData;
+    private HeapPageId pid;
+    private TupleDesc td;
+    private byte[] header;
+    private Tuple[] tuples;
+    private int numSlots;
+    private byte[] oldData;
 
     /**
      * Create a HeapPage from a set of bytes of data read from disk.
@@ -73,7 +72,7 @@ public class HeapPage implements Page {
      */
     private int getNumTuples() {
         // some code goes here
-        return 0;
+        return (BufferPool.PAGE_SIZE * 8) / (td.getSize() * 8 + 1);
 
     }
 
@@ -83,9 +82,10 @@ public class HeapPage implements Page {
      * @return the number of bytes in the header of a page in a HeapFile with each tuple occupying tupleSize bytes
      */
     private int getHeaderSize() {
-
         // some code goes here
-        return 0;
+        int tupsPerPage = getNumTuples();
+        int upward = tupsPerPage % 8 > 0 ? 1 : 0;
+        return tupsPerPage / 8 + upward;
 
     }
 
@@ -116,7 +116,7 @@ public class HeapPage implements Page {
     @Override
     public HeapPageId getId() {
         // some code goes here
-        throw new UnsupportedOperationException("implement this");
+        return this.pid;
     }
 
     /**
@@ -209,8 +209,7 @@ public class HeapPage implements Page {
         }
 
         // padding
-        int zerolen = BufferPool.PAGE_SIZE - (header.length + td.getSize() * tuples.length); //- numSlots * td
-        // .getSize();
+        int zerolen = BufferPool.PAGE_SIZE - (header.length + td.getSize() * tuples.length);
         byte[] zeroes = new byte[zerolen];
         try {
             dos.write(zeroes, 0, zerolen);
@@ -292,7 +291,13 @@ public class HeapPage implements Page {
      */
     public int getNumEmptySlots() {
         // some code goes here
-        return 0;
+        int emptySlots = 0;
+        for (int i = 0; i < tuples.length; i++) {
+            if (!isSlotUsed(i)) {
+                emptySlots++;
+            }
+        }
+        return emptySlots;
     }
 
     /**
@@ -300,7 +305,13 @@ public class HeapPage implements Page {
      */
     public boolean isSlotUsed(int i) {
         // some code goes here
-        return false;
+        int byteNum = i / 8;
+        int posInByte = i % 8;
+        return isOne(header[byteNum], posInByte);
+    }
+
+    private boolean isOne(byte target, int posInByte) {
+        return (byte) (target << (7 - posInByte)) < 0;
     }
 
     /**
@@ -318,7 +329,33 @@ public class HeapPage implements Page {
      */
     public Iterator<Tuple> iterator() {
         // some code goes here
-        return null;
+        return new UsedTupleIterator();
+    }
+
+    private class UsedTupleIterator implements Iterator<Tuple> {
+        private int cursorInArr = 0;
+        private int cursorInNotEmptySlots = 0;
+
+        @Override
+        public boolean hasNext() {
+            return cursorInArr < getNumTuples() && cursorInNotEmptySlots < getUsedTuplesNum();
+        }
+
+        @Override
+        public Tuple next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            while (!isSlotUsed(cursorInArr)) {
+                cursorInArr++;
+            }
+            cursorInNotEmptySlots++;
+            return tuples[cursorInArr++];
+        }
+
+        private int getUsedTuplesNum() {
+            return getNumTuples() - getNumEmptySlots();
+        }
     }
 
 }

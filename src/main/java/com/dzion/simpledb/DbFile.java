@@ -20,13 +20,13 @@ public interface DbFile extends Serializable {
      *
      * @throws IllegalArgumentException if the page does not exist in this file.
      */
-    Page readPage(PageId id);
+    Page readPage(PageId id) throws IOException;
 
     /**
      * Push the specified page to disk.
      *
      * @param p The page to write.  page.getId().pageno() specifies the offset into the file where the page should be
-     *         written.
+     *          written.
      * @throws IOException if the write fails
      */
     void writePage(Page p) throws IOException;

@@ -54,7 +54,10 @@ public class TupleDesc implements Serializable {
 
         @Override
         public int hashCode() {
-            return super.hashCode();
+            int ret = 17;
+            ret = ret * 31 + fieldType.hashCode();
+            ret = ret * 31 + fieldName.hashCode();
+            return ret;
         }
     }
 

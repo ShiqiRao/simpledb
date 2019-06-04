@@ -7,7 +7,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class TestUtil {
     /**
@@ -239,6 +240,7 @@ public class TestUtil {
             return tableid;
         }
 
+        @Override
         public DbFileIterator iterator(TransactionId tid) {
             throw new RuntimeException("not implemented");
         }
@@ -267,16 +269,20 @@ public class TestUtil {
             this.cur = low;
         }
 
+        @Override
         public void open() {
         }
 
+        @Override
         public void close() {
         }
 
+        @Override
         public void rewind() {
             cur = low;
         }
 
+        @Override
         public TupleDesc getTupleDesc() {
             return Utility.getTupleDesc(width);
         }
@@ -291,12 +297,14 @@ public class TestUtil {
             return tup;
         }
 
-		public boolean hasNext() throws DbException, TransactionAbortedException {
+        @Override
+        public boolean hasNext() throws DbException, TransactionAbortedException {
 			if (cur >= high) return false;
 			return true;
 		}
 
-		public Tuple next() throws DbException, TransactionAbortedException, NoSuchElementException {
+        @Override
+        public Tuple next() throws DbException, TransactionAbortedException, NoSuchElementException {
 			if(cur >= high) throw new NoSuchElementException();
             Tuple tup = new Tuple(getTupleDesc());
             for (int i = 0; i < width; ++i)
